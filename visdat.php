@@ -23,16 +23,19 @@
     //       $hasil = 2;
     //   }
       
-    //   $result = mysqli_query($conn, "UPDATE  SET sentiment=$hasil WHERE id=$id");
+    //   $result = mysqli_query($conn, "UPDATE tweet2 SET sentiment=$hasil WHERE id=$id");
       
     //   header("Location: index.php?halaman=" . $halaman);
     //   }
 
 
-      if(isset($_POST['preprocess']))
+      if(isset($_POST['cari']))
       {
-          $output = passthru("python preprocess.py");
-          header("Location: preprocessing.php");
+          mysqli_query($conn, "DELETE FROM ftweet");
+          $name = $_POST['name'];
+          $halaman = $_POST['halaman'];
+          $output = passthru("python tweet_test2.py $name");
+          header("Location: index.php");
       }
   ?>
 
@@ -67,11 +70,11 @@
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
-      <li class="nav-item mt-3">
+        <li class="nav-item mt-3">
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Training</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="Index.php">
+          <a class="nav-link  " href="Index.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>shop </title>
@@ -91,7 +94,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link  active" href="preprocessing.php">
+          <a class="nav-link  " href="preprocessing.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>credit-card</title>
@@ -131,7 +134,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link  " href="visdat.php">
+          <a class="nav-link  active" href="visdat.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>box-3d-50</title>
@@ -166,13 +169,6 @@
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-          <form action="" method="POST" name="form1">
-              <table width="25%" border="0">
-                  <tr> 
-                      <td><input class="btn btn-primary mt-3" type="submit" name="preprocess" value="Preprocess"></td>
-                  </tr>
-              </table>
-          </form>
           </div>
           <ul class="navbar-nav  justify-content-end">
             <li class="nav-item d-flex align-items-center">
@@ -187,97 +183,43 @@
     </nav>
     <!-- End Navbar -->
     <div class="container-fluid py-4">
-      <div class="row my-4">
-        <div class="col-lg-8 col-md-6 mb-md-0 mb-4 w-100">
-          <div class="card" style="width: ;">
-            <div class="card-header pb-0">
-              <div class="row">
-                <div class="col-lg-6 col-7">
-                  <h6>Result</h6>
-                </div>
-                <div class="col-lg-6 col-5 my-auto text-end">
-                  <div class="dropdown float-lg-end pe-4">
-                  </div>
-                </div>
-              </div>
+      <div class="row">
+        <div class="col-12 col-xl-4">
+          <div class="card h-100">
+            <div class="card-header pb-0 p-3">
+              <h6 class="mb-0">Diagram Batang</h6>
             </div>
-            <div class="card-body px-0 pb-2">
-              <div class="table">
-                <table class="table align-items-center mb-0">
-                  <thead>
-                    <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Username</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Text</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Text Proses</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tbody>
-                                        
-                      <?php
-                          $batas = 6;
-                          $halaman = isset($_GET['halaman'])?(int)$_GET['halaman'] : 1;
-                          $halaman_awal = ($halaman>1) ? ($halaman * $batas) - $batas : 0;	
-          
-                          $previous = $halaman - 1;
-                          $next = $halaman + 1;
-                          
-                          $data = mysqli_query($conn,"select * from ftweet");
-                          $jumlah_data = mysqli_num_rows($data);
-                          $total_halaman = ceil($jumlah_data / $batas);
-          
-                          $data = mysqli_query($conn,"select * from ftweet limit $halaman_awal, $batas");
-                          $nomor = $halaman_awal+1;
-                          while($d = mysqli_fetch_array($data)){
-                              ?>
-                              <form name="update_sentimen" method="post" >
-                                  
-                                  <input type="hidden" name="halaman" value="<?php echo $halaman ?>"> 
-                              <tr>
-                                  
-                                  <td><?php echo $nomor++; ?></td>
-                                  <td><?php echo $d['username'] ?></td>
-                                  <td class="text-wrap"><?php echo $d['text_raw'] ?></td>
-                                  <td class="text-wrap"><?php echo $d['text_process'] ?></td>
-                                  <td>
-                                  
-                                  
-                                  <input type="hidden" name="id" value="<?php echo $d['id'] ?>"> 
-                                  
-                            
-
-                              <div class="footer">
-
-                              </div>
-
-                              <?php
-                                }
-                              ?>
-                  </tbody>
-                </table>
-              </div>
-              <nav>
-                  <ul class="pagination justify-content-center">
-                      <li class="page-item">
-                          <a class="page-link" style="background-color: ;" <?php if($halaman > 1){ echo "href='?halaman=$previous'"; } ?>><<</a>
-                      </li>
-                      <?php 
-                      for($x=1;$x<=$total_halaman;$x++){
-                          ?> 
-                          <li class="page-item"><a class="page-link" <?php if($x == $halaman){ echo 'style="background-color:#21274D"';}?>  href="?halaman=<?php echo $x ?>"><?php echo $x; ?></a></li>
-                          <?php 
-                      }
-                      ?>				
-                      <li class="page-item">
-                          <a  class="page-link" <?php if($halaman < $total_halaman) { echo "href='?halaman=$next'"; } ?>>>></a>
-                      </li>
-                  </ul>
-              </nav>
+            <div class="card-body p-3">
+              
             </div>
           </div>
         </div>
-    </div>
+        <div class="col-12 col-xl-4">
+          <div class="card h-100">
+            <div class="card-header pb-0 p-3">
+              <div class="row">
+                <div class="col-md-8 d-flex align-items-center">
+                  <h6 class="mb-0">Diagram Lingkaran</h6>
+                </div>
+                <div class="col-md-4 text-end">
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-3">
+              
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-xl-4">
+          <div class="card h-100">
+            <div class="card-header pb-0 p-3">
+              <h6 class="mb-0">Banyak Kata</h6>
+            </div>
+            <div class="card-body p-3">
+              
+            </div>
+          </div>
+        </div>
   </main>
   <!--   Core JS Files   -->
   <script src="assets/js/core/popper.min.js"></script>

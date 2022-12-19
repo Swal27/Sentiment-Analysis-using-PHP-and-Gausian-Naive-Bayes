@@ -5,12 +5,14 @@ from datetime import datetime, timedelta, timezone
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
 
-consumer_key = 'SwdcgILvEZaWRyK0IMT2DdAxe'
-consumer_secret = '6waeB6lxCtJExj2wtTgjZT0WX5qOrv9DN1Vm6ET86BHRqc1rYA'
-access_token = '802299183709372416-mDKPckyQg442t4tFhnZoVytmSmJKwjx'
-access_secret = 'CgVg6kco3ftvgJANoalsr1jGJA4KeYExqsuiPbIjxb7Vu'
+consumer_key = 'JIcbVwXcxzXP4YHe9VxfYblI1'
+consumer_secret = 'n6QdIw1Jjn1kuIVkq57m9CilLGAYD1c87wC3x6SVKn0K9p4YVn'
+access_token = '2900925361-FpXwZYAy3QPyO4gHeRSjF9lwlFi5a6bETlkTDdG'
+access_secret = 'vSRGC2fE1hlFX6OEAfb2GxFP8IM1J8DM0McDTq0GeuTRs'
 tweetsPerQry = 10
-maxTweets = 100
+maxTweets = 20
+for arg in sys.argv:
+    print(arg)
 hashtag = sys.argv[1]
 
 mydb = mariadb.connect(
@@ -24,37 +26,36 @@ authentication = tweepy.OAuthHandler(consumer_key, consumer_secret)
 authentication.set_access_token(access_token, access_secret)
 api = tweepy.API(authentication, wait_on_rate_limit=True)#, wait_on_rate_limit_notify=True)'
 maxId = -1
-tweetCount = 0
-while tweetCount < maxTweets:
-    if(maxId <= 0):
-        newTweets = api.search_tweets(q=hashtag, count=tweetsPerQry, result_type="recent", tweet_mode="extended")
-    else:
-        newTweets = api.search_tweets(q=hashtag, count=tweetsPerQry, max_id=str(maxId - 1), result_type="recent", tweet_mode="extended")
+tweetCount = 0  
+mycursor = mydb.cursor()
+newTweets = tweepy.Cursor(api.search_tweets, q=hashtag).items(maxTweets)
 
-    if not newTweets:
-        print("Tweet Habis")
-        break
+newTweets = [x for x in newTweets]
 
-    val = []
-    for tweet in newTweets:
-        user_screen_name = tweet.user.screen_name
-        text = tweet.full_text.encode('utf-8')
-        tweet_tuple = (
-            user_screen_name,
-            text
-        ) 
-        print(str(id)+":"+str(text)+"\n\n")
+total = 0
+val = []
+for tweet in newTweets:
+    text = tweet.text
+    user_screen_name = tweet.user.screen_name
+    tweet_tuple = (
+        user_screen_name,
+        text
+    ) 
+    query = "SELECT * FROM ftweet WHERE text_raw=%s"
+    mycursor.execute(query, (text,))
+
+    x = [i for i in mycursor]
+
+    if x == []:
+        # print(str(id)+":"+str(text)+"\n\n")
         val.append(tweet_tuple)
 
+sql = '''
+    INSERT INTO ftweet (username, text_raw) 
+    VALUES (%s,%s)
+'''
+mycursor.executemany(sql, val)
 
-    mycursor = mydb.cursor()    
-    sql = '''
-        INSERT INTO ftweet (username, text_raw) 
-        VALUES (%s,%s)
-    '''
-    mycursor.executemany(sql, val)
-    mydb.commit()
-    tweetCount += len(newTweets)	
-    maxId = newTweets[-1].id
-
-    mydb.close()
+mydb.commit()
+tweetCount += len(newTweets)	
+maxId = newTweets[-1].id

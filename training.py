@@ -51,6 +51,9 @@ print("Recall = " + str(Recall))
 Presicion = metrics.precision_score(predicted, y_test)
 print("Presicion = " + str(Presicion))
 
+f_measure = metrics.f1_score(y_test, predicted)
+print("F-measure = " + str(f_measure))
+
 #menyimpan model
 filename = 'model.ict'
 joblib.dump(model, filename)
