@@ -111,7 +111,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link  " href="labeling.php">
+          <a class="nav-link  active" href="labeling.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>office</title>
@@ -131,7 +131,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link  active" href="visdat.php">
+          <a class="nav-link  " href="visdat.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>box-3d-50</title>
