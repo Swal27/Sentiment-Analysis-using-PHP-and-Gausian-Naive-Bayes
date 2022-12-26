@@ -43,16 +43,16 @@ predicted = gaussian.predict(x_test.toarray())
 
 #hasil training
 akurasi = metrics.accuracy_score(predicted, y_test)
-print("Akurasi = " + str(akurasi))
+print(str(akurasi))
 
 Recall = metrics.recall_score(predicted, y_test)
-print("Recall = " + str(Recall))
+print(str(Recall))
 
 Presicion = metrics.precision_score(predicted, y_test)
-print("Presicion = " + str(Presicion))
+print(str(Presicion))
 
 f_measure = metrics.f1_score(y_test, predicted)
-print("F-measure = " + str(f_measure))
+print(str(f_measure))
 
 #menyimpan model
 filename = 'model.ict'

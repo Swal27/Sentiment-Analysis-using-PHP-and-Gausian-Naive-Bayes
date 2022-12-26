@@ -5,6 +5,7 @@
   <?php
     include "koneksi.php";
     $no = 1;
+    
   //    $data = mysqli_query($conn,"select * from tweet2");
 
     // if(isset($_POST['sentimen']))
@@ -26,16 +27,6 @@
       
     //   header("Location: index.php?halaman=" . $halaman);
     //   }
-
-
-      if(isset($_POST['cari']))
-      {
-          mysqli_query($conn, "DELETE FROM ftweet");
-          $name = $_POST['name'];
-          $halaman = $_POST['halaman'];
-          $output = passthru("python tweet_test2.py $name");
-          header("Location: index.php");
-      }
   ?>
 
   <meta charset="utf-8" />
@@ -133,7 +124,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link  active" href="visdat.php">
+          <a class="nav-link " href="visdat.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>box-3d-50</title>
@@ -154,7 +145,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link  " href="training.php">
+          <a class="nav-link  active" href="training.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>settings</title>
@@ -192,8 +183,7 @@
           <form action="" method="POST" name="form1">
               <table width="25%" border="0">
                   <tr> 
-                      <td><input type="text" name="name" placeholder="Hastag.." class="m-2"></td>
-                      <td><input class="btn btn-primary mt-3" type="submit" name="cari" value="Tarik"></td>
+                      <td><input class="btn btn-primary mt-3" type="submit" name="Model" value="Model"></td>
                   </tr>
               </table>
           </form>
@@ -230,69 +220,28 @@
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Username</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Text</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Akurasi</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Recall</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Presicion</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">F-measure</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tbody>
                                         
-                      <?php
-                          $batas = 6;
-                          $halaman = isset($_GET['halaman'])?(int)$_GET['halaman'] : 1;
-                          $halaman_awal = ($halaman>1) ? ($halaman * $batas) - $batas : 0;	
-          
-                          $previous = $halaman - 1;
-                          $next = $halaman + 1;
-                          
-                          $data = mysqli_query($conn,"select * from ftweet");
-                          $jumlah_data = mysqli_num_rows($data);
-                          $total_halaman = ceil($jumlah_data / $batas);
-          
-                          $data = mysqli_query($conn,"select * from ftweet limit $halaman_awal, $batas");
-                          $nomor = $halaman_awal+1;
-                          while($d = mysqli_fetch_array($data)){
-                              ?>
-                              <form name="update_sentimen" method="post" >
-                                  
-                                  <input type="hidden" name="halaman" value="<?php echo $halaman ?>"> 
-                              <tr>
-                                  
-                                  <td><?php echo $nomor++; ?></td>
-                                  <td><?php echo $d['username'] ?></td>
-                                  <td class="text-wrap"><?php echo $d['text_raw'] ?></td>
-                      
-                              </tr>
-                              </form>
-
-                              <div class="footer">
-
-                              </div>
-
-                              <?php
-                                }
-                              ?>
-                  </tbody>
+                    <?php
+                          if(isset($_POST['Model']))
+                          {
+                              
+                              // $kalimat = $_POST['kalimat'];
+                              $test = exec("python training.py", $output);
+                              for($i = 0;$i<4;$i++){
+                              echo '<td>' . $output[$i] . '</td>';
+                              }
+                          }
+                          ?>
                 </table>
               </div>
-              <nav>
-                  <ul class="pagination justify-content-center">
-                      <li class="page-item">
-                          <a class="page-link" style="background-color: ;" <?php if($halaman > 1){ echo "href='?halaman=$previous'"; } ?>><<</a>
-                      </li>
-                      <?php 
-                      for($x=1;$x<=$total_halaman;$x++){
-                          ?> 
-                          <li class="page-item"><a class="page-link" <?php if($x == $halaman){ echo 'style="background-color:#21274D"';}?>  href="?halaman=<?php echo $x ?>"><?php echo $x; ?></a></li>
-                          <?php 
-                      }
-                      ?>				
-                      <li class="page-item">
-                          <a  class="page-link" <?php if($halaman < $total_halaman) { echo "href='?halaman=$next'"; } ?>>>></a>
-                      </li>
-                  </ul>
-              </nav>
             </div>
           </div>
         </div>
