@@ -12,13 +12,7 @@
     $row_negatif = mysqli_num_rows($jumlah_negatif);
     $row_netral = mysqli_num_rows($jumlah_netral);
 
-    $data = [
-      ['Positif', $jumlah_positif],
-      ['Negatif', $jumlah_negatif],
-      ['Netral', $jumlah_netral]
-    ];
-    // Encode the data as a JSON string
-    $dataJson = json_encode($data);
+    $output = passthru("python visdat.py $row_positif $row_negatif $row_netral");
     $no = 1;
   ?>
 
@@ -192,10 +186,10 @@
         <div class="col-12 col-xl-4">
           <div class="card h-100">
             <div class="card-header pb-0 p-3">
-              <h6 class="mb-0">Diagram Batang</h6>
+              <h6 class="mb-0">Diagram Bar</h6>
             </div>
             <div class="card-body p-3">
-              <canvas id="donut"></canvas>
+              <img src="bar.jpg" alt=""></img>
             </div>
           </div>
         </div>
@@ -204,24 +198,24 @@
             <div class="card-header pb-0 p-3">
               <div class="row">
                 <div class="col-md-8 d-flex align-items-center">
-                  <h6 class="mb-0">Diagram Lingkaran</h6>
+                  <h6 class="mb-0">Diagram Donut</h6>
                 </div>
                 <div class="col-md-4 text-end">
                 </div>
               </div>
             </div>
             <div class="card-body p-3">
-              
+            <img src="donut.jpg" alt=""></img>
             </div>
           </div>
         </div>
         <div class="col-12 col-xl-4">
           <div class="card h-100">
             <div class="card-header pb-0 p-3">
-              <h6 class="mb-0">Banyak Kata</h6>
+              <h6 class="mb-0">Diagram Pie</h6>
             </div>
             <div class="card-body p-3">
-              
+            <img src="pie.jpg" alt=""></img>
             </div>
           </div>
         </div>
