@@ -30,11 +30,11 @@
 
       if(isset($_POST['cari']))
       {
-          mysqli_query($conn, "DELETE FROM ftweet");
+          mysqli_query($conn, "DELETE FROM ttweet");
           $name = $_POST['name'];
           $halaman = $_POST['halaman'];
-          $output = passthru("python tweet_training.py $name");
-          header("Location: index.php");
+          $output = passthru("python tweet_testing.py $name");
+          header("Location: tariktesting.php");
       }
   ?>
 
@@ -73,7 +73,7 @@
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Training</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link  active" href="Index.php">
+          <a class="nav-link  " href="Index.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>shop </title>
@@ -178,7 +178,7 @@
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Testing</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link  " href="tariktesting.php">
+          <a class="nav-link active" href="tariktesting.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>shop </title>
@@ -266,11 +266,11 @@
                           $previous = $halaman - 1;
                           $next = $halaman + 1;
                           
-                          $data = mysqli_query($conn,"select * from ftweet");
+                          $data = mysqli_query($conn,"select * from ttweet");
                           $jumlah_data = mysqli_num_rows($data);
                           $total_halaman = ceil($jumlah_data / $batas);
           
-                          $data = mysqli_query($conn,"select * from ftweet limit $halaman_awal, $batas");
+                          $data = mysqli_query($conn,"select * from ttweet limit $halaman_awal, $batas");
                           $nomor = $halaman_awal+1;
                           while($d = mysqli_fetch_array($data)){
                               ?>

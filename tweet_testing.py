@@ -1,0 +1,61 @@
+import tweepy
+import getopt, sys
+import mariadb
+from datetime import datetime, timedelta, timezone
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
+
+consumer_key = 'JIcbVwXcxzXP4YHe9VxfYblI1'
+consumer_secret = 'n6QdIw1Jjn1kuIVkq57m9CilLGAYD1c87wC3x6SVKn0K9p4YVn'
+access_token = '2900925361-FpXwZYAy3QPyO4gHeRSjF9lwlFi5a6bETlkTDdG'
+access_secret = 'vSRGC2fE1hlFX6OEAfb2GxFP8IM1J8DM0McDTq0GeuTRs'
+tweetsPerQry = 10
+maxTweets = 10
+for arg in sys.argv:
+    print(arg)
+hashtag = sys.argv[1]
+
+mydb = mariadb.connect(
+  host="localhost",
+  user="root",
+  passwd="",
+  database="social_media"
+)
+
+authentication = tweepy.OAuthHandler(consumer_key, consumer_secret)
+authentication.set_access_token(access_token, access_secret)
+api = tweepy.API(authentication, wait_on_rate_limit=True)#, wait_on_rate_limit_notify=True)'
+maxId = -1
+tweetCount = 0  
+mycursor = mydb.cursor()
+newTweets = tweepy.Cursor(api.search_tweets, q=hashtag).items(maxTweets)
+
+newTweets = [x for x in newTweets]
+
+total = 0
+val = []
+for tweet in newTweets:
+    text = tweet.text
+    user_screen_name = tweet.user.screen_name
+    tweet_tuple = (
+        user_screen_name,
+        text
+    ) 
+    query = "SELECT * FROM ttweet WHERE text_raw=%s"
+    mycursor.execute(query, (text,))
+
+    x = [i for i in mycursor]
+
+    if x == []:
+        # print(str(id)+":"+str(text)+"\n\n")
+        val.append(tweet_tuple)
+
+sql = '''
+    INSERT INTO ttweet (username, text_raw) 
+    VALUES (%s,%s)
+'''
+mycursor.executemany(sql, val)
+
+mydb.commit()
+tweetCount += len(newTweets)	
+maxId = newTweets[-1].id
