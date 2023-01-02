@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,14 +6,34 @@
   <?php
     include "koneksi.php";
     $no = 1;
-    if(isset($_POST['cari']))
-    {
-      mysqli_query($conn, "DELETE FROM ftweet");
-      $name = $_POST['name'];
-      $halaman = $_POST['halaman'];
-      $output = passthru("python tweet_training.py $name");
-      header("Location: index.php");
-    }
+  //    $data = mysqli_query($conn,"select * from tweet2");
+
+    // if(isset($_POST['sentimen']))
+    //   {	
+    //   $id = $_POST['id'];
+    //   $halaman = $_POST['halaman'];
+      
+      
+    //   $sentiment=$_POST['sentimen'];
+    //   if($sentiment == 'Netral'){
+    //       $hasil = 0;
+    //   }elseif($sentiment == "Positif"){
+    //       $hasil = 1;
+    //   }else{
+    //       $hasil = 2;
+    //   }
+      
+    //   $result = mysqli_query($conn, "UPDATE  SET sentiment=$hasil WHERE id=$id");
+      
+    //   header("Location: index.php?halaman=" . $halaman);
+    //   }
+
+
+      if(isset($_POST['preprocess']))
+      {
+          $output = passthru("python preprocess_testing.py");
+          header("Location: preproces_testing.php");
+      }
   ?>
 
   <meta charset="utf-8" />
@@ -50,7 +71,7 @@
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Training</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link  active" href="Index.php">
+          <a class="nav-link  " href="Index.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>shop </title>
@@ -175,7 +196,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link  " href="preprocess_testing.php">
+          <a class="nav-link  active" href="preprocess_testing.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>credit-card</title>
@@ -250,8 +271,7 @@
           <form action="" method="POST" name="form1">
               <table width="25%" border="0">
                   <tr> 
-                      <td><input type="text" name="name" placeholder="Hastag.." class="m-2"></td>
-                      <td><input class="btn btn-primary mt-3" type="submit" name="cari" value="Tarik"></td>
+                      <td><input class="btn btn-primary mt-3" type="submit" name="preprocess" value="Preprocess"></td>
                   </tr>
               </table>
           </form>
@@ -291,6 +311,7 @@
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Username</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Text</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Text Proses</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -304,11 +325,11 @@
                           $previous = $halaman - 1;
                           $next = $halaman + 1;
                           
-                          $data = mysqli_query($conn,"select * from ftweet");
+                          $data = mysqli_query($conn,"select * from ttweet");
                           $jumlah_data = mysqli_num_rows($data);
                           $total_halaman = ceil($jumlah_data / $batas);
           
-                          $data = mysqli_query($conn,"select * from ftweet limit $halaman_awal, $batas");
+                          $data = mysqli_query($conn,"select * from ttweet limit $halaman_awal, $batas");
                           $nomor = $halaman_awal+1;
                           while($d = mysqli_fetch_array($data)){
                               ?>
@@ -320,9 +341,13 @@
                                   <td><?php echo $nomor++; ?></td>
                                   <td><?php echo $d['username'] ?></td>
                                   <td class="text-wrap"><?php echo $d['text_raw'] ?></td>
-                      
-                              </tr>
-                              </form>
+                                  <td class="text-wrap"><?php echo $d['text_process'] ?></td>
+                                  <td>
+                                  
+                                  
+                                  <input type="hidden" name="id" value="<?php echo $d['id'] ?>"> 
+                                  
+                            
 
                               <div class="footer">
 

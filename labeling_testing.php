@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,14 +6,13 @@
   <?php
     include "koneksi.php";
     $no = 1;
-    if(isset($_POST['cari']))
-    {
-      mysqli_query($conn, "DELETE FROM ftweet");
-      $name = $_POST['name'];
-      $halaman = $_POST['halaman'];
-      $output = passthru("python tweet_training.py $name");
-      header("Location: index.php");
-    }
+  //    $data = mysqli_query($conn,"select * from tweet2");
+
+    $output = passthru("python labeling.py");
+
+    
+
+
   ?>
 
   <meta charset="utf-8" />
@@ -35,7 +35,7 @@
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">
-<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
+  <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
       <a class="navbar-brand m-0" href="Index.php" target="_blank">
@@ -46,11 +46,11 @@
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
-        <li class="nav-item mt-3">
+      <li class="nav-item mt-3">
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Training</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link  active" href="Index.php">
+          <a class="nav-link  " href="Index.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>shop </title>
@@ -195,7 +195,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link  " href="labeling_testing.php">
+          <a class="nav-link  active" href="labeling_testing.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>office</title>
@@ -245,26 +245,6 @@
         <nav aria-label="breadcrumb">
           <h6 class="font-weight-bolder mb-0">Dashboard</h6>
         </nav>
-        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
-          <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-          <form action="" method="POST" name="form1">
-              <table width="25%" border="0">
-                  <tr> 
-                      <td><input type="text" name="name" placeholder="Hastag.." class="m-2"></td>
-                      <td><input class="btn btn-primary mt-3" type="submit" name="cari" value="Tarik"></td>
-                  </tr>
-              </table>
-          </form>
-          </div>
-          <ul class="navbar-nav  justify-content-end">
-            <li class="nav-item d-flex align-items-center">
-              <a href="javascript:;" class="nav-link text-body font-weight-bold px-0">
-                <i class="fa fa-user me-sm-1"></i>
-                <span class="d-sm-inline d-none">Kelompok 2</span>
-              </a>
-            </li>
-          </ul>
-        </div>
       </div>
     </nav>
     <!-- End Navbar -->
@@ -291,6 +271,7 @@
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Username</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Text</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sentiment</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -304,11 +285,11 @@
                           $previous = $halaman - 1;
                           $next = $halaman + 1;
                           
-                          $data = mysqli_query($conn,"select * from ftweet");
+                          $data = mysqli_query($conn,"select * from ttweet");
                           $jumlah_data = mysqli_num_rows($data);
                           $total_halaman = ceil($jumlah_data / $batas);
           
-                          $data = mysqli_query($conn,"select * from ftweet limit $halaman_awal, $batas");
+                          $data = mysqli_query($conn,"select * from ttweet limit $halaman_awal, $batas");
                           $nomor = $halaman_awal+1;
                           while($d = mysqli_fetch_array($data)){
                               ?>
@@ -320,14 +301,31 @@
                                   <td><?php echo $nomor++; ?></td>
                                   <td><?php echo $d['username'] ?></td>
                                   <td class="text-wrap"><?php echo $d['text_raw'] ?></td>
-                      
+                                  <td>
+                                  
+                                  
+                                  <input type="hidden" name="id" value="<?php echo $d['id'] ?>"> 
+                                  
+                                  <div class="dropdown">
+                                    <a class="btn btn-secondary" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                      <?php
+                                            $hasil = $d['sentiment'];
+                                            if($hasil == 0){
+                                                $hasil = "Netral";
+                                            }elseif ($hasil == 1) {
+                                              $hasil = "Positif";
+                                            }else{
+                                              $hasil = "Negatif";
+                                            }
+                                            echo $hasil;
+                                      ?>
+                                    </a>
+                                  </div>
+                                  </td>
                               </tr>
                               </form>
-
                               <div class="footer">
-
                               </div>
-
                               <?php
                                 }
                               ?>

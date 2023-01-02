@@ -1,18 +1,19 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <?php
     include "koneksi.php";
+    $jumlah_positif = mysqli_query($conn, "SELECT * from ttweet where sentiment = 1");
+    $jumlah_negatif = mysqli_query($conn, "SELECT * from ttweet where sentiment = 2");
+    $jumlah_netral = mysqli_query($conn, "SELECT * from ttweet where sentiment = 0");
+    $row_positif = mysqli_num_rows($jumlah_positif);
+    $row_negatif = mysqli_num_rows($jumlah_negatif);
+    $row_netral = mysqli_num_rows($jumlah_netral);
+
+    $output = passthru("python visdat_testing.py $row_positif $row_negatif $row_netral");
     $no = 1;
-    if(isset($_POST['cari']))
-    {
-      mysqli_query($conn, "DELETE FROM ftweet");
-      $name = $_POST['name'];
-      $halaman = $_POST['halaman'];
-      $output = passthru("python tweet_training.py $name");
-      header("Location: index.php");
-    }
   ?>
 
   <meta charset="utf-8" />
@@ -27,6 +28,7 @@
   <!-- Nucleo Icons -->
   <link href="assets/css/nucleo-icons.css" rel="stylesheet" />
   <link href="assets/css/nucleo-svg.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
   <!-- Font Awesome Icons -->
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
   <link href="assets/css/nucleo-svg.css" rel="stylesheet" />
@@ -35,7 +37,7 @@
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">
-<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
+  <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
     <div class="sidenav-header">
       <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
       <a class="navbar-brand m-0" href="Index.php" target="_blank">
@@ -50,7 +52,7 @@
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Training</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link  active" href="Index.php">
+          <a class="nav-link  " href="Index.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>shop </title>
@@ -215,7 +217,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link  " href="visdat_testing.php">
+          <a class="nav-link  active" href="visdat_testing.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>box-3d-50</title>
@@ -247,14 +249,6 @@
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-          <form action="" method="POST" name="form1">
-              <table width="25%" border="0">
-                  <tr> 
-                      <td><input type="text" name="name" placeholder="Hastag.." class="m-2"></td>
-                      <td><input class="btn btn-primary mt-3" type="submit" name="cari" value="Tarik"></td>
-                  </tr>
-              </table>
-          </form>
           </div>
           <ul class="navbar-nav  justify-content-end">
             <li class="nav-item d-flex align-items-center">
@@ -269,92 +263,43 @@
     </nav>
     <!-- End Navbar -->
     <div class="container-fluid py-4">
-      <div class="row my-4">
-        <div class="col-lg-8 col-md-6 mb-md-0 mb-4 w-100">
-          <div class="card" style="width: ;">
-            <div class="card-header pb-0">
-              <div class="row">
-                <div class="col-lg-6 col-7">
-                  <h6>Result</h6>
-                </div>
-                <div class="col-lg-6 col-5 my-auto text-end">
-                  <div class="dropdown float-lg-end pe-4">
-                  </div>
-                </div>
-              </div>
+      <div class="row">
+        <div class="col-12 col-xl-4">
+          <div class="card h-100">
+            <div class="card-header pb-0 p-3">
+              <h6 class="mb-0">Diagram Bar</h6>
             </div>
-            <div class="card-body px-0 pb-2">
-              <div class="table">
-                <table class="table align-items-center mb-0">
-                  <thead>
-                    <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Username</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Text</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tbody>
-                                        
-                      <?php
-                          $batas = 6;
-                          $halaman = isset($_GET['halaman'])?(int)$_GET['halaman'] : 1;
-                          $halaman_awal = ($halaman>1) ? ($halaman * $batas) - $batas : 0;	
-          
-                          $previous = $halaman - 1;
-                          $next = $halaman + 1;
-                          
-                          $data = mysqli_query($conn,"select * from ftweet");
-                          $jumlah_data = mysqli_num_rows($data);
-                          $total_halaman = ceil($jumlah_data / $batas);
-          
-                          $data = mysqli_query($conn,"select * from ftweet limit $halaman_awal, $batas");
-                          $nomor = $halaman_awal+1;
-                          while($d = mysqli_fetch_array($data)){
-                              ?>
-                              <form name="update_sentimen" method="post" >
-                                  
-                                  <input type="hidden" name="halaman" value="<?php echo $halaman ?>"> 
-                              <tr>
-                                  
-                                  <td><?php echo $nomor++; ?></td>
-                                  <td><?php echo $d['username'] ?></td>
-                                  <td class="text-wrap"><?php echo $d['text_raw'] ?></td>
-                      
-                              </tr>
-                              </form>
-
-                              <div class="footer">
-
-                              </div>
-
-                              <?php
-                                }
-                              ?>
-                  </tbody>
-                </table>
-              </div>
-              <nav>
-                  <ul class="pagination justify-content-center">
-                      <li class="page-item">
-                          <a class="page-link" style="background-color: ;" <?php if($halaman > 1){ echo "href='?halaman=$previous'"; } ?>><<</a>
-                      </li>
-                      <?php 
-                      for($x=1;$x<=$total_halaman;$x++){
-                          ?> 
-                          <li class="page-item"><a class="page-link" <?php if($x == $halaman){ echo 'style="background-color:#21274D"';}?>  href="?halaman=<?php echo $x ?>"><?php echo $x; ?></a></li>
-                          <?php 
-                      }
-                      ?>				
-                      <li class="page-item">
-                          <a  class="page-link" <?php if($halaman < $total_halaman) { echo "href='?halaman=$next'"; } ?>>>></a>
-                      </li>
-                  </ul>
-              </nav>
+            <div class="card-body p-3">
+              <img src="bar_testing.jpg" alt=""></img>
             </div>
           </div>
         </div>
-    </div>
+        <div class="col-12 col-xl-4">
+          <div class="card h-100">
+            <div class="card-header pb-0 p-3">
+              <div class="row">
+                <div class="col-md-8 d-flex align-items-center">
+                  <h6 class="mb-0">Diagram Donut</h6>
+                </div>
+                <div class="col-md-4 text-end">
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-3">
+            <img src="donut_testing.jpg" alt=""></img>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-xl-4">
+          <div class="card h-100">
+            <div class="card-header pb-0 p-3">
+              <h6 class="mb-0">Diagram Pie</h6>
+            </div>
+            <div class="card-body p-3">
+            <img src="pie_testing.jpg" alt=""></img>
+            </div>
+          </div>
+        </div>
   </main>
   <!--   Core JS Files   -->
   <script src="assets/js/core/popper.min.js"></script>
@@ -363,71 +308,21 @@
   <script src="assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="assets/js/plugins/chartjs.min.js"></script>
   <script>
-    var ctx = document.getElementById("chart-bars").getContext("2d");
-
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-        datasets: [{
-          label: "Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "#fff",
-          data: [450, 200, 100, 220, 500, 100, 400, 230, 500],
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
+    new Chart(document.getElementById('donut'), {
+        type: 'doughnut',
+        data: {
+          labels: <?php echo $dataJson ?>.map(datum => datum[0]),
+          datasets: [{
+            data: <?php echo $dataJson ?>.map(datum => datum[1]),
+            backgroundColor: ['#f1c40f', '#e67e22', '#16a085', '#9b59b6']
+          }]
+        },
+        options: {
           legend: {
-            display: false,
+            position: 'bottom'
           }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-            },
-            ticks: {
-              suggestedMin: 0,
-              suggestedMax: 500,
-              beginAtZero: true,
-              padding: 15,
-              font: {
-                size: 14,
-                family: "Open Sans",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff"
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false
-            },
-            ticks: {
-              display: false
-            },
-          },
-        },
-      },
-    });
+        }
+      });
 
 
     var ctx2 = document.getElementById("chart-line").getContext("2d");
