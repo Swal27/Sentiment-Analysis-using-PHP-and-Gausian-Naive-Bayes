@@ -30,7 +30,6 @@
 
       if(isset($_POST['cari']))
       {
-          mysqli_query($conn, "DELETE FROM ttweet");
           $name = $_POST['name'];
           $halaman = $_POST['halaman'];
           $output = passthru("python tweet_testing.py $name");

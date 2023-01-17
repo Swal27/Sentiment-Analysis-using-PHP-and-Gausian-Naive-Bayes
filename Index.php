@@ -7,7 +7,6 @@
     $no = 1;
     if(isset($_POST['cari']))
     {
-      mysqli_query($conn, "DELETE FROM ftweet");
       $name = $_POST['name'];
       $halaman = $_POST['halaman'];
       $output = passthru("python tweet_training.py $name");

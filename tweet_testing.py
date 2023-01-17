@@ -10,7 +10,7 @@ consumer_secret = 'n6QdIw1Jjn1kuIVkq57m9CilLGAYD1c87wC3x6SVKn0K9p4YVn'
 access_token = '2900925361-FpXwZYAy3QPyO4gHeRSjF9lwlFi5a6bETlkTDdG'
 access_secret = 'vSRGC2fE1hlFX6OEAfb2GxFP8IM1J8DM0McDTq0GeuTRs'
 tweetsPerQry = 10
-maxTweets = 10
+maxTweets = 100
 for arg in sys.argv:
     print(arg)
 hashtag = sys.argv[1]
