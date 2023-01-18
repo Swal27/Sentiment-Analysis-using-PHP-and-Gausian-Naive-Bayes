@@ -7,10 +7,10 @@ jumlah_negatif = int(sys.argv[2])
 jumlah_netral = int(sys.argv[3])
 
 # Diagram donut
-labels = ['Jumlah Positif', 'Jumlah Negatif', 'Jumlah Netral']
-sizes = [jumlah_positif, jumlah_negatif, jumlah_netral]
+labels = ['Jumlah Positif', 'Jumlah Negatif']
+sizes = [jumlah_positif, jumlah_negatif]
 colors = ['purple', 'gold', 'lightskyblue']
-explode = (0, 0, 0)  # explode a slice
+explode = (0, 0)  # explode a slice
 
 fig, ax = plt.subplots(figsize=(500/96, 500/96), dpi=96)
 ax.pie(sizes, explode=explode, labels=labels, colors=colors,

@@ -32,7 +32,7 @@
       if(isset($_POST['preprocess']))
       {
           $output = passthru("python preprocess_testing.py");
-          header("Location: preproces_testing.php");
+          header("Location: preprocess_testing.php");
       }
   ?>
 
