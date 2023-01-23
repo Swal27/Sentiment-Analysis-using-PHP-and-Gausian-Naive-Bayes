@@ -4,13 +4,12 @@
 <head>
   <?php
     include "koneksi.php";
-    $no = 1;
-    if(isset($_POST['cari']))
-    {
-      $name = $_POST['name'];
-      $halaman = $_POST['halaman'];
-      $output = passthru("python tweet_training.py $name");
-      header("Location: index.php");
+    if(isset($_POST['hapus']))
+    {   
+        
+        mysqli_query($conn, "DELETE FROM ttweet");
+        mysqli_query($conn, "DELETE FROM ftweet");
+        header("Location: hapusdata.php");
     }
   ?>
 
@@ -28,6 +27,7 @@
   <link href="assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- Font Awesome Icons -->
   <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
   <link href="assets/css/nucleo-svg.css" rel="stylesheet" />
   <!-- CSS Files -->
   <link id="pagestyle" href="assets/css/soft-ui-dashboard.css?v=1.0.6" rel="stylesheet" />
@@ -49,7 +49,7 @@
           <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Training</h6>
         </li>
         <li class="nav-item">
-          <a class="nav-link  active" href="Index.php">
+          <a class="nav-link " href="Index.php">
             <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
               <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <title>shop </title>
@@ -266,14 +266,6 @@
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-          <form action="" method="POST" name="form1">
-              <table width="25%" border="0">
-                  <tr> 
-                      <td><input type="text" name="name" placeholder="Hastag.." class="m-2"></td>
-                      <td><input class="btn btn-primary mt-3" type="submit" name="cari" value="Tarik"></td>
-                  </tr>
-              </table>
-          </form>
           </div>
           <ul class="navbar-nav  justify-content-end">
             <li class="nav-item d-flex align-items-center">
@@ -294,7 +286,7 @@
             <div class="card-header pb-0">
               <div class="row">
                 <div class="col-lg-6 col-7">
-                  <h6>Result</h6>
+                  <h6>Hapus Data</h6>
                 </div>
                 <div class="col-lg-6 col-5 my-auto text-end">
                   <div class="dropdown float-lg-end pe-4">
@@ -302,76 +294,17 @@
                 </div>
               </div>
             </div>
-            <div class="card-body px-0 pb-2">
-              <div class="table">
-                <table class="table align-items-center mb-0">
-                  <thead>
-                    <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Username</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Text</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tbody>
-                                        
-                      <?php
-                          $batas = 6;
-                          $halaman = isset($_GET['halaman'])?(int)$_GET['halaman'] : 1;
-                          $halaman_awal = ($halaman>1) ? ($halaman * $batas) - $batas : 0;	
-          
-                          $previous = $halaman - 1;
-                          $next = $halaman + 1;
-                          
-                          $data = mysqli_query($conn,"select * from ftweet");
-                          $jumlah_data = mysqli_num_rows($data);
-                          $total_halaman = ceil($jumlah_data / $batas);
-          
-                          $data = mysqli_query($conn,"select * from ftweet limit $halaman_awal, $batas");
-                          $nomor = $halaman_awal+1;
-                          while($d = mysqli_fetch_array($data)){
-                              ?>
-                              <form name="update_sentimen" method="post" >
-                                  
-                                  <input type="hidden" name="halaman" value="<?php echo $halaman ?>"> 
-                              <tr>
-                                  
-                                  <td><?php echo $nomor++; ?></td>
-                                  <td><?php echo $d['username'] ?></td>
-                                  <td class="text-wrap"><?php echo $d['text_raw'] ?></td>
-                      
-                              </tr>
-                              </form>
-
-                              <div class="footer">
-
-                              </div>
-
-                              <?php
-                                }
-                              ?>
-                  </tbody>
-                </table>
-              </div>
-              <nav>
-                  <ul class="pagination justify-content-center">
-                      <li class="page-item">
-                          <a class="page-link" style="background-color: ;" <?php if($halaman > 1){ echo "href='?halaman=$previous'"; } ?>><<</a>
-                      </li>
-                      <?php 
-                      for($x=1;$x<=$total_halaman;$x++){
-                          ?> 
-                          <li class="page-item"><a class="page-link" <?php if($x == $halaman){ echo 'style="background-color:#21274D"';}?>  href="?halaman=<?php echo $x ?>"><?php echo $x; ?></a></li>
-                          <?php 
-                      }
-                      ?>				
-                      <li class="page-item">
-                          <a  class="page-link" <?php if($halaman < $total_halaman) { echo "href='?halaman=$next'"; } ?>>>></a>
-                      </li>
-                  </ul>
-              </nav>
+            <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+            <form action="" method="POST" name="form1">
+              <table width="25%" border="0">
+                <tr> 
+                  <td>
+                    <button type="submit" class="btn btn-danger" name="hapus" onclick="showAlert()">Hapus</button>
+                  </td>
+                </tr>
+              </table>
+            </form>
             </div>
-          </div>
         </div>
     </div>
   </main>
@@ -382,174 +315,11 @@
   <script src="assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="assets/js/plugins/chartjs.min.js"></script>
   <script>
-    var ctx = document.getElementById("chart-bars").getContext("2d");
-
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-        datasets: [{
-          label: "Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "#fff",
-          data: [450, 200, 100, 220, 500, 100, 400, 230, 500],
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-            },
-            ticks: {
-              suggestedMin: 0,
-              suggestedMax: 500,
-              beginAtZero: true,
-              padding: 15,
-              font: {
-                size: 14,
-                family: "Open Sans",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff"
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false
-            },
-            ticks: {
-              display: false
-            },
-          },
-        },
-      },
-    });
-
-
-    var ctx2 = document.getElementById("chart-line").getContext("2d");
-
-    var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
-    gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-    gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
-
-    var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
-    gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-    gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
-
-    new Chart(ctx2, {
-      type: "line",
-      data: {
-        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-        datasets: [{
-            label: "Mobile apps",
-            tension: 0.4,
-            borderWidth: 0,
-            pointRadius: 0,
-            borderColor: "#cb0c9f",
-            borderWidth: 3,
-            backgroundColor: gradientStroke1,
-            fill: true,
-            data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-            maxBarThickness: 6
-
-          },
-          {
-            label: "Websites",
-            tension: 0.4,
-            borderWidth: 0,
-            pointRadius: 0,
-            borderColor: "#3A416F",
-            borderWidth: 3,
-            backgroundColor: gradientStroke2,
-            fill: true,
-            data: [30, 90, 40, 140, 290, 290, 340, 230, 400],
-            maxBarThickness: 6
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#b2b9bf',
-              font: {
-                size: 11,
-                family: "Open Sans",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#b2b9bf',
-              padding: 20,
-              font: {
-                size: 11,
-                family: "Open Sans",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
+  function showAlert() {
+      if(confirm("Apakah anda yakin ingin menghapus data ini?")){
+          document.form1.submit();
+      }
+  }
   </script>
   <script>
     var win = navigator.platform.indexOf('Win') > -1;
