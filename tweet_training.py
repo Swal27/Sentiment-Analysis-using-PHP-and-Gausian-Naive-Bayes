@@ -5,10 +5,10 @@ from datetime import datetime, timedelta, timezone
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
 
-consumer_key = 'JIcbVwXcxzXP4YHe9VxfYblI1'
-consumer_secret = 'n6QdIw1Jjn1kuIVkq57m9CilLGAYD1c87wC3x6SVKn0K9p4YVn'
-access_token = '2900925361-FpXwZYAy3QPyO4gHeRSjF9lwlFi5a6bETlkTDdG'
-access_secret = 'vSRGC2fE1hlFX6OEAfb2GxFP8IM1J8DM0McDTq0GeuTRs'
+consumer_key = '-------'
+consumer_secret = '-------'
+access_token = '-------'
+access_secret = '--------'
 tweetsPerQry = 10
 maxTweets = 200
 for arg in sys.argv:
